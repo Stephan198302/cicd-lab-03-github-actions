@@ -151,9 +151,17 @@ permissions:
 jobs:
   lint:       # yamllint + actionlint + shellcheck ops/*.sh + ign-lint + docker compose config
     runs-on: ubuntu-latest
+    timeout-minutes: 5
   validate:   # ops/validate.sh — every project *.json valid, every code.py parses
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 ```
+
+Note the job ids are bare `lint` / `validate` with **no `name:` override** — branch
+protection matches required checks by the displayed name, so the ids must match what
+participants selected in You-do step 4. A participant who adds pretty `name:` labels to
+their jobs after configuring protection has orphaned their required checks (see the trap
+below).
 
 The `validate` job is the gateway-free green/red signal; `ign-lint` (PyPI `ign-lint==0.6.1`,
 from `bw-design-group/ignition-lint`) is the Ignition-native linter for Perspective
@@ -180,6 +188,7 @@ from `bw-design-group/ignition-lint`) is the Ignition-native linter for Perspect
 ### Acceptable variations
 
 - **Job ordering** — lint-then-validate or the reverse; the jobs are independent.
+- **Missing `timeout-minutes`** — `nitpick:`; point at the 6-hour hung-job default.
 - **Skipping a linter** — ask why. "We have no shell scripts" is acceptable; "I forgot" isn't.
   `ign-lint` and `validate` are not optional — they're the point.
 

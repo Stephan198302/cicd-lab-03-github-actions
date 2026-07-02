@@ -177,6 +177,7 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
       - run: ops/validate.sh
@@ -188,6 +189,7 @@ Then add a second job that runs the Part 1 linters, including `ign-lint`:
 ```yaml
   lint:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -208,6 +210,11 @@ you go:
 - **`GITHUB_TOKEN`** — auto-provisioned per job, scoped to the repo, expires when the job ends.
 - **Secrets vs variables** — secrets are encrypted and masked (`***`) in logs; variables
   are plain text. Live-add an `EXAMPLE_SECRET` and confirm it's masked.
+- **Job ids are check names** — branch protection (You-do step 4) matches status checks
+  by name, and a job's name *is* its id (`lint`, `validate`) unless you override it with
+  `name:`. Rename a job later and any required check pointing at the old name waits forever.
+- **`timeout-minutes: 5`** — a hung job otherwise runs (and bills) for up to 6 hours;
+  capping every job is free insurance.
 
 ### You do
 

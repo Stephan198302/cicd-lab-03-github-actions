@@ -283,5 +283,6 @@ gh api -X DELETE "repos/<user>/<repo>/actions/runners/<runner-id>"
 ### Take-home cleanup checklist
 
 A participant who does the optional hands-on must: revert the workflow to `ubuntu-latest`,
-`docker stop` the runner, confirm it's gone from the Runners list, and **revoke the PAT**.
-A lingering token is a real security smell — push them to complete it.
+`docker stop` the runner, and confirm it's gone from the Runners list. The registration
+tokens from `gh api` are short-lived, but if they minted a PAT for any of this, have them
+**revoke it** — a lingering token is a real security smell; push them to complete the cleanup.

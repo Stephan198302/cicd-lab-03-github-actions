@@ -23,7 +23,8 @@ is the subject of [Lab 04](https://github.com/mustry-academy/cicd-lab-04-ignitio
 - Pass [`cicd-preflight`](https://github.com/mustry-academy/cicd-preflight)
 - Docker (with the Compose V2 plugin) — ~1.5 GB RAM is plenty for the single gateway
 - Python 3.10+ (for the linters: `ign-lint`, `yamllint`)
-- A GitHub Personal Access Token with `repo` scope (for the self-hosted-runner demo). Generate ahead of class.
+- The [GitHub CLI](https://cli.github.com/) (`gh`), authenticated (`gh auth status`) — Part 3's
+  runner demo mints its short-lived registration token through it; no personal access token needed.
 
 ## Quick start
 

@@ -49,7 +49,8 @@ ign-lint --config rule_config.json --files "projects/**/view.json"   # Ignition-
 The other linters Part 1 introduces (install separately — see [`exercises/lab.md`](./exercises/lab.md)):
 
 ```bash
-pip install yamllint==1.35.1        # same venv as above
+source .venv/bin/activate           # the venv from the block above (no-op if still active)
+pip install yamllint==1.35.1
 yamllint -c .yamllint.yml .
 # actionlint, shellcheck install separately — see exercises/lab.md
 ```

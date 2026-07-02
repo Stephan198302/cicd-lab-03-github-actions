@@ -43,11 +43,11 @@ pip install yamllint==1.35.1 ign-lint==0.6.1     # ign-lint needs Python 3.10+
 ```
 
 > **Why the venv?** A bare `pip install` on Homebrew or Ubuntu 24.04+ Python fails with
-> `error: externally-managed-environment` (PEP 668); the venv sidesteps that everywhere
-> and keeps the lab's pinned tool versions out of your system Python. `.venv/` is already
-> gitignored. Re-activate in new terminals with `source .venv/bin/activate`. (Don't
-> `brew install yamllint` alongside it — you'd end up with two versions and PATH decides
-> which one runs; the pinned pip install is the one CI uses.)
+> `error: externally-managed-environment` (PEP 668); the venv sidesteps that and keeps
+> the lab's pinned tool versions out of your system Python. `.venv/` is already
+> gitignored. Re-activate in new terminals with `source .venv/bin/activate`. On a
+> minimal Debian/Ubuntu box, install the venv module first: `sudo apt install
+> python3-venv`. (Skip `brew install yamllint` — the pinned pip version is the one CI uses.)
 
 > **About `ign-lint`:** it's the one Ignition-specific tool here — a young, pre-1.0 linter
 > (v0.6.1) from [BW Design Group](https://github.com/bw-design-group)
@@ -199,7 +199,7 @@ Then add a second job that runs the Part 1 linters, including `ign-lint`:
 ```yaml
   lint:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10   # this job installs tools; give it more headroom than validate
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -223,8 +223,9 @@ you go:
 - **Job ids are check names** — branch protection (You-do step 4) matches status checks
   by name, and a job's name *is* its id (`lint`, `validate`) unless you override it with
   `name:`. Rename a job later and any required check pointing at the old name waits forever.
-- **`timeout-minutes: 5`** — a hung job otherwise runs (and bills) for up to 6 hours;
-  capping every job is free insurance.
+- **`timeout-minutes`** — a hung job otherwise runs (and bills) for up to 6 hours;
+  capping every job is free insurance. Size it per job: a required check that flakes
+  because a slow apt mirror blew a too-tight cap blocks the whole team.
 
 ### You do
 
@@ -279,24 +280,26 @@ Fix and re-push.
 > doesn't pass, it stays **"Expected — waiting for status" forever**. Try it: open
 > another README-only PR now and watch it hang. With branch protection on, nobody can
 > merge a docs-only change without an admin override. GitHub's documented fix is a
-> **twin no-op workflow** — same workflow name, same job names, an inverse
-> `paths-ignore:` filter — that reports an instant green `lint` and `validate` on
-> exactly the PRs the real CI skips
+> **twin no-op workflow** with the **same job names** — the job name is what a required
+> check matches on — and an inverse `paths-ignore:` filter, so it reports an instant
+> green `lint` and `validate` on exactly the PRs the real CI skips
 > ([Handling skipped but required checks](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/troubleshooting-required-status-checks#handling-skipped-but-required-checks)).
 > Building it is a stretch goal below; for this lab repo it's also fine to just
 > understand *why* the PR hangs — this exact interaction bites real teams.
 
-**5 — Sanity check.** Commit any remaining changes. Your workflow should match the shipped
-[`.github/workflows/ci.yml`](../.github/workflows/ci.yml) — see
+**5 — Sanity check.** Commit any remaining changes. Your workflow should *structurally*
+match the shipped [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) — same
+triggers, jobs, and step order; step `name:` labels and comments may differ — see
 [`instructor-notes/lab-key.md`](../instructor-notes/lab-key.md) for the reference end state.
 
 ### Stretch `[OPTIONAL]`
 
 - **Fix the docs-only-PR hang** with the no-op twin from the step 4 callout: a second
-  workflow, also `name: CI`, whose `paths-ignore:` mirrors the real filter list, with
-  jobs `lint` and `validate` that just `echo` and exit 0. Same job names → the required
-  checks report green on docs-only PRs. Mind the caveat in GitHub's docs: a PR touching
-  both docs *and* code triggers both workflows.
+  workflow whose `paths-ignore:` mirrors the real filter list, with jobs named exactly
+  `lint` and `validate` that just `echo` and exit 0 — the *job* names are what the
+  required checks match on (the workflow's `name:` is cosmetic). Mind the caveat in
+  GitHub's docs: a PR touching both docs *and* code triggers both workflows, and two
+  check runs then report under each name.
 - **Matrix `ign-lint` over individual views** so each view surfaces as its own check — a
   one-entry matrix today, but the pattern that scales as the HMI grows. (For now the single
   globbed step is plenty; the matrix is about isolating *which* view broke, not speed.)

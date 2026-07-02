@@ -159,7 +159,7 @@ permissions:
 jobs:
   lint:       # yamllint + actionlint + shellcheck ops/*.sh + ign-lint + docker compose config
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10   # installs tools — needs more headroom than validate
   validate:   # ops/validate.sh — every project *.json valid, every code.py parses
     runs-on: ubuntu-latest
     timeout-minutes: 5

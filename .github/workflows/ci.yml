@@ -24,8 +24,10 @@ jobs:
   # `name:`) silently orphans the required checks configured on main.
   lint:
     runs-on: ubuntu-latest
-    # A hung job otherwise runs (and bills) for up to 6 hours.
-    timeout-minutes: 5
+    # A hung job otherwise runs (and bills) for up to 6 hours. This job installs
+    # tools (apt + pip + a Docker-based action), so give it more headroom than
+    # validate — a required check that flakes on a slow mirror blocks everyone.
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
 

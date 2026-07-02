@@ -244,7 +244,7 @@ body{
     <div class="stage">Setup · before Part 1</div>
   </div>
   <div class="body">
-    <div class="sechead"><span class="num warm">SETUP</span><div><div class="title">Gateway up, linters in, repo yours</div><div class="lead">Most of this happened in the I-do — run through it to make sure nothing's missing.</div></div></div>
+    <div class="sechead"><span class="num warm">SETUP</span><div><div class="title">Gateway up, linters in, repo yours</div><div class="lead">Most of this happened in the We-do — run through it to make sure nothing's missing.</div></div></div>
     <div class="cols2">
       <div class="steps">
         <div class="step"><div class="ix t">1</div><div class="tx"><b>Boot the gateway</b> — <span class="inlinecode">cp .env.example .env</span> then <span class="inlinecode">ops/setup.sh</span>. Wait for RUNNING; open <span class="inlinecode">http://localhost:8088</span>. This is the lab's deployment environment: only <span class="inlinecode">./projects</span> is bind-mounted into it, so the files the linters check <b>are</b> the files the gateway runs. (<span class="inlinecode">ops/teardown.sh</span> stops it.)</div></div>
@@ -347,7 +347,7 @@ ops/validate.sh</pre></div>
   <div class="body">
     <div class="eyebrow">Part 2 · solo · your own repo</div>
     <div class="title" style="color:#fff;max-width:22ch">Make the workflow yours — and make it the gatekeeper</div>
-    <p class="lead">You built the two-job workflow in the I-do. Starting point in your repo (full version in <span class="mono" style="color:#dbe4f0">exercises/lab.md</span>):</p>
+    <p class="lead">You built the two-job workflow in the We-do. Starting point in your repo (full version in <span class="mono" style="color:#dbe4f0">exercises/lab.md</span>):</p>
     <div class="code" style="max-width:720px"><pre>name: CI
 on: [pull_request]            <span class="cm"># ← you'll refine this</span>
 permissions: {contents: read}

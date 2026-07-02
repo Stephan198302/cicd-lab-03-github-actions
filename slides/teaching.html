@@ -303,7 +303,7 @@ body{
         <p>Workflows → jobs → steps, triggers, the runner model, and the required check.</p>
         <h4 style="margin-top:16px">3 · Self-hosted runners</h4>
         <p>Where CI runs when GitHub-hosted can't reach your plant network.</p>
-        <div class="ex">then → I-do (10:00) → you-do (11:00)</div>
+        <div class="ex">then → We-do (10:00) → you-do (11:00)</div>
       </div>
     </div>
   </div>
@@ -713,7 +713,7 @@ on:
       <span class="num">07</span>
       <div>
         <div class="title">Reading the lab's <span class="mono" style="font-size:34px">ci.yml</span></div>
-        <div class="lead">This is the file you'll build from scratch in the I-do and finish in the lab. Two independent jobs — the Part 1 linters, and the validator.</div>
+        <div class="lead">This is the file you'll build from scratch in the We-do and finish in the lab. Two independent jobs — the Part 1 linters, and the validator.</div>
       </div>
     </div>
     <div class="cols2">
@@ -777,7 +777,7 @@ jobs:
     <ul class="checks" style="max-width:960px">
       <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b><span class="mono">permissions: contents: read</span></b> — least privilege at the workflow level. The default <span class="mono">GITHUB_TOKEN</span> grant is broader than a lint job ever needs; our jobs only read the repo, so that's all they get.</span></li>
       <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b><span class="mono">GITHUB_TOKEN</span></b> — auto-provisioned <b>per job</b>, scoped to <b>this repo</b>, expires when the job ends. You never create it, rotate it, or store it.</span></li>
-      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Secrets</b> — encrypted at rest, injected on demand, and <b>masked as <span class="mono">***</span> in logs</b>. In the I-do we add an <span class="mono">EXAMPLE_SECRET</span>, echo it, and watch GitHub censor it live.</span></li>
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Secrets</b> — encrypted at rest, injected on demand, and <b>masked as <span class="mono">***</span> in logs</b>. In the We-do we add an <span class="mono">EXAMPLE_SECRET</span>, echo it, and watch GitHub censor it live.</span></li>
       <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>Variables</b> — the unencrypted sibling. Fine for a gateway URL; never for a password. If it would hurt in a screenshot, it's a secret.</span></li>
     </ul>
     <div class="callout">
@@ -949,7 +949,7 @@ ops/teardown.sh   <span class="cm"># stop · --volumes wipes gateway state</span
           <div class="lab" style="color:var(--red)">Never do this</div>
           <p><b>Never attach a self-hosted runner to a public repo that accepts fork PRs.</b> A malicious PR edits the workflow, the runner dutifully executes it — exfiltrated secrets, a backdoor, a pivot into the PLC network. This is not theoretical.</p>
         </div>
-        <div class="code" style="margin-top:16px"><pre><span class="cm"># the demo you'll see in the I-do:</span>
+        <div class="code" style="margin-top:16px"><pre><span class="cm"># the demo you'll see in the We-do:</span>
 <span class="cm"># ephemeral Docker runner, one job, then gone</span>
 docker run -d --rm --name lab03-runner \
   -e REPO_URL=<span class="cmd2">"https://github.com/&lt;you&gt;/&lt;repo&gt;"</span> \
@@ -977,20 +977,20 @@ docker run -d --rm --name lab03-runner \
 <section class="slide dark">
   <div class="topbar">
     <div class="on-dark brandrow"><img class="logo-img" src="logos/OriginalLight.png" alt="Mustry Solutions"></div>
-    <div class="stage on-dark">Teaching → I-do → You-do</div>
+    <div class="stage on-dark">Teaching → We-do → You-do</div>
   </div>
 
   <div class="body">
     <div class="eyebrow">Now we make it real</div>
     <div class="title" style="max-width:24ch;color:#fff">Next: we <em style="font-style:normal;color:var(--peri2)">break</em> the project on purpose — and let the machines find it.</div>
     <ul class="checks" style="max-width:960px;margin-top:22px">
-      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>I-do (10:00).</b> <span class="mono">ops/seed.sh</span> plants six realistic bugs — including the brittle binding and the runaway poll you just saw. We run every linter live, read the output, fix one finding each. Then we build <span class="mono">ci.yml</span> from scratch, open a PR, watch a secret get masked, and register an ephemeral runner.</span></li>
+      <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>We-do (10:00).</b> <span class="mono">ops/seed.sh</span> plants six realistic bugs — including the brittle binding and the runaway poll you just saw. We run every linter live, read the output, fix one finding each. Then we build <span class="mono">ci.yml</span> from scratch, open a PR, watch a secret get masked, and register an ephemeral runner.</span></li>
       <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>You-do (11:00, breakout rooms).</b> You hunt the remaining findings yourself, tune <span class="mono">.yamllint.yml</span>, then finish the workflow in <b>your own repo</b>: path filters, compose validation, a badge, and a required check that blocks a red PR.</span></li>
       <li><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span><b>The payoff.</b> By lunch, "broken project files can't reach <span class="mono">main</span>" is not a promise — it's a setting.</span></li>
     </ul>
   </div>
 
-  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Next → I-do (10:00) · exercises/lab.md</span></div>
+  <div class="foot"><span>Mustry Academy · CI/CD for Ignition</span><span>Next → We-do (10:00) · exercises/lab.md</span></div>
 </section>
 
 </div>

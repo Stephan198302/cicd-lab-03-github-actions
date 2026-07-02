@@ -93,7 +93,7 @@ any time with:
 git restore . && rm -f .github/workflows/example.yml
 ```
 
-### I do
+### We-do
 
 The instructor live-demos on the seeded state. For each tool: run it, read the output,
 fix one finding.
@@ -154,7 +154,7 @@ whole thing a *required check* no one can merge past.
 
 Start from a clean tree (Part 1 fixes applied, `.yamllint.yml` in place).
 
-### I do
+### We-do
 
 The mental model:
 

@@ -79,7 +79,14 @@ changes the Clock binding `now(1000)` → `now(250)`. `rule_config.json` sets
 **Fix:** restore `now(1000)` (or slower). Teaching point: fast polls multiply across a
 deployed HMI and hammer the gateway.
 
-**6. `project.json` — `ops/validate.sh` (malformed JSON).** `seed.sh` leaves a **trailing
+**6. Overview `view.json` — ign-lint `NamePatternRule` (snake_case component).** `seed.sh`
+renames the **Power** KPI tile to `power_tile`. Components must be PascalCase (severity
+`error` in `rule_config.json`), so ign-lint flags it and suggests `PowerTile`.
+**Fix:** rename it back to `Power`. Teaching point: naming drift is the most common
+real-world ign-lint finding — a quick rename in the Designer that ignores the team
+convention, invisible until someone greps for the old name.
+
+**7. `project.json` — `ops/validate.sh` (malformed JSON).** `seed.sh` leaves a **trailing
 comma** after the last property in `project.json` (`"parent": ""` → `"parent": "",`) — exactly
 the slip a hand-edit of a tracked resource produces. `ops/validate.sh` runs `json.load` over
 every `*.json` under `projects/`, so it fails to parse and the script exits 1 (the red PR
@@ -97,9 +104,9 @@ readability more than it helps.
 ### Clean end state
 
 After Part 1: trailing whitespace stripped; `ops/scan.sh` variable re-quoted; `example.yml`
-fixed or deleted; the Discharge binding restored to its `runScript(...)` data source and the
-Clock restored to `now(1000)`; the trailing comma removed from `project.json`; the
-`.yamllint.yml` comment extended. Every linter silent and `ops/validate.sh` exits 0.
+fixed or deleted; the Discharge binding restored to its `runScript(...)` data source, the
+Clock restored to `now(1000)`, and the Power tile renamed back to `Power`; the trailing
+comma removed from `project.json`; the `.yamllint.yml` comment extended. Every linter silent and `ops/validate.sh` exits 0.
 
 ### Grading
 
@@ -107,9 +114,10 @@ Clock restored to `now(1000)`; the trailing comma removed from `project.json`; t
   output and `ops/validate.sh` exits 0 on the final state.
 - **Justified config changes.** If they disabled a `yamllint`/`ign-lint` rule, the commit
   message or config comment should explain why.
-- **No "fixed by deleting it" cheats.** Deleting the Clock or Discharge binding to silence
-  ign-lint is wrong — restore them to real data bindings; only the *reference* and the *poll
-  rate* were broken, not the components. Removing `example.yml` is fine (it was optional).
+- **No "fixed by deleting it" cheats.** Deleting the Clock, the Discharge binding, or the
+  Power tile to silence ign-lint is wrong — restore them; only the *reference*, the *poll
+  rate*, and the *name* were broken, not the components. Removing `example.yml` is fine
+  (it was optional).
 - **The view still loads.** Editing a binding is a `view.json` edit — confirm they didn't
   break the JSON or leave a dangling reference.
 

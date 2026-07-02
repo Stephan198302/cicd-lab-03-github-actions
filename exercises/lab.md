@@ -94,8 +94,9 @@ ops/seed.sh
 ```
 
 This plants a handful of issues into your working tree — at least one for every tool,
-including a couple of realistic Ignition findings in the Perspective view: a **brittle, broken
-binding** and a **runaway poll rate**. Hunt them down with the linters. Reset to a clean tree
+including three realistic Ignition findings in the Perspective view: a **brittle, broken
+binding**, a **runaway poll rate**, and a **mis-named component**. Hunt them down with the
+linters. Reset to a clean tree
 any time with:
 
 ```bash

@@ -18,7 +18,7 @@ automated, file-based deployment is the subject of Labs 04–05. The goal here i
 
 ## What you'll do
 
-- **Part 1 — Linters as your safety net:** yamllint, shellcheck, actionlint, **ign-lint**, `ops/validate.sh`
+- **Part 1 — Linters as your safety net:** yamllint, shellcheck, actionlint, **ign-lint**, `scripts/validate.sh`
 - **Part 2 — GitHub Actions:** build `ci.yml`, path filters, required check
 - **Part 3 — Self-hosted runners:** a look ahead (short demo) — hands-on comes in Labs 04–05
 
@@ -29,7 +29,7 @@ the gateway boots:
 
 ```bash
 cp .env.example .env
-ops/setup.sh        # boots one Ignition gateway, waits for RUNNING, prints the URL + login
+scripts/setup.sh        # boots one Ignition gateway, waits for RUNNING, prints the URL + login
 # open http://localhost:8088  → log in with the .env credentials
 ```
 
@@ -71,7 +71,7 @@ and [`docs/self-hosted-runners.md`](../docs/self-hosted-runners.md).
 
 ## Part 1 — Linters as your safety net
 
-**Goal:** run yamllint, shellcheck, actionlint, **ign-lint**, and `ops/validate.sh`
+**Goal:** run yamllint, shellcheck, actionlint, **ign-lint**, and `scripts/validate.sh`
 against a real Ignition project; read each tool's output; decide whether to fix,
 configure away, or ignore each finding; and tune `.yamllint.yml` to fit the project.
 
@@ -81,7 +81,7 @@ run them all — it's to know which one would have caught yesterday's regression
 ### Seed the broken state
 
 ```bash
-ops/seed.sh
+scripts/seed.sh
 ```
 
 This plants a handful of issues into your working tree — at least one for every tool,
@@ -99,7 +99,7 @@ The instructor live-demos on the seeded state. For each tool: run it, read the o
 fix one finding.
 
 1. `yamllint -c .yamllint.yml docker-compose.yml` — YAML syntax + style (finds trailing whitespace).
-2. `ops/validate.sh` — the gateway-free green/red signal: every `*.json` under `projects/`
+2. `scripts/validate.sh` — the gateway-free green/red signal: every `*.json` under `projects/`
    is valid JSON, every `code.py` parses as Python 3. Exit 0 = green, 1 = red. The same
    check the PR uses.
 3. `ign-lint --config rule_config.json --files "projects/**/view.json"` — **the flagship
@@ -108,7 +108,7 @@ fix one finding.
    rates, brittle references, and the Python embedded in views — all without a running
    gateway.
 4. `actionlint` — GitHub Actions workflow syntax + expression typing (run it on the seeded `example.yml`).
-5. `shellcheck ops/*.sh` — catches almost every shell scripting bug ever made.
+5. `shellcheck scripts/*.sh` — catches almost every shell scripting bug ever made.
 
 Spend the most time on **ign-lint** — it's the one that's genuinely Ignition-aware, and
 the one most people here have never seen. Open `rule_config.json` and walk the rules:
@@ -116,20 +116,20 @@ the one most people here have never seen. Open `rule_config.json` and walk the r
 kebab-case, custom methods → snake_case), `PollingIntervalRule` (a floor on binding poll
 rates — 1000 ms here), `BadComponentReferenceRule` (flags `.getSibling()` / `.getParent()`
 traversal), `PylintScriptRule`, and the rest. The clean `lab-project` passes ign-lint with
-**zero** findings — every finding you see is something `ops/seed.sh` broke on purpose.
+**zero** findings — every finding you see is something `scripts/seed.sh` broke on purpose.
 
 ### You do
 
 Fix the remaining planted issues, then make the config your own.
 
-1. Run each of `yamllint`, `shellcheck`, `actionlint`, `ign-lint`, and `ops/validate.sh`,
+1. Run each of `yamllint`, `shellcheck`, `actionlint`, `ign-lint`, and `scripts/validate.sh`,
    and write down each finding — make a list.
 2. Fix every finding. For each, record: *what the tool flagged*, *why your fix is correct*,
    and *what class of production bug it would catch*.
-3. Re-run every linter until each is silent and `ops/validate.sh` exits 0.
+3. Re-run every linter until each is silent and `scripts/validate.sh` exits 0.
 4. Open `.yamllint.yml`. We disabled `line-length` for the project — **extend the comment**
    explaining *why* (hint: long compose environment lines).
-5. Commit. Your end state should be a clean tree: every linter silent, `ops/validate.sh`
+5. Commit. Your end state should be a clean tree: every linter silent, `scripts/validate.sh`
    exits 0.
 
 > Stuck on a finding? [`instructor-notes/lab-key.md`](../instructor-notes/lab-key.md) has the
@@ -179,7 +179,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: ops/validate.sh
+      - run: scripts/validate.sh
 ```
 
 Open a PR, watch it run, read the logs together — each step is its own collapsible block.
@@ -197,7 +197,7 @@ Then add a second job that runs the Part 1 linters, including `ign-lint`:
       - run: yamllint -c .yamllint.yml .
       - uses: raven-actions/actionlint@v2
       - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends shellcheck
-      - run: shellcheck ops/*.sh
+      - run: shellcheck scripts/*.sh
       - run: ign-lint --config rule_config.json --files "projects/**/view.json"
 ```
 
@@ -220,7 +220,7 @@ on:
   pull_request:
     paths:
       - "projects/**"
-      - "ops/**"
+      - "scripts/**"
       - "docker-compose.yml"
       - ".github/workflows/**"
       - ".yamllint.yml"
@@ -249,7 +249,7 @@ typos, malformed environment maps.
 
 **4 — Required check.** In repo settings, configure branch protection on `main`: require a
 PR before merging, and require status checks — select **`lint`** and **`validate`**. Now
-introduce a failure — run `ops/seed.sh` to plant the broken state (or just set the Clock's
+introduce a failure — run `scripts/seed.sh` to plant the broken state (or just set the Clock's
 poll to `now(250)` by hand) — commit it, and open a PR. Confirm GitHub blocks the merge.
 Fix and re-push.
 
@@ -329,7 +329,7 @@ it" beats "maybe.")
 
 You built a CI safety net for an Ignition project, end to end:
 
-- **Local linters** — yamllint, shellcheck, actionlint, **ign-lint**, and `ops/validate.sh`
+- **Local linters** — yamllint, shellcheck, actionlint, **ign-lint**, and `scripts/validate.sh`
   — each catching a class of bug before it ships.
 - **A GitHub Actions workflow** that runs them on every PR, with least-privilege permissions,
   path filters, and a status badge.

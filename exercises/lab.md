@@ -476,12 +476,15 @@ existing `gh` auth and expires on its own in ~1 hour), then start the runner con
 it appear in *Settings → Actions → Runners* and print `Listening for Jobs`:
 
 ```bash
+# your repo — auto-detected, nothing to substitute
+REPO=$(gh repo view --json nameWithOwner --jq .nameWithOwner)
+
 # short-lived registration token
-export RUNNER_TOKEN="$(gh api -X POST \
-  "repos/<you>/<repo>/actions/runners/registration-token" --jq .token)"
+RUNNER_TOKEN=$(gh api -X POST \
+  "repos/$REPO/actions/runners/registration-token" --jq .token)
 
 docker run -d --rm --name lab03-runner \
-  -e REPO_URL="https://github.com/<you>/<repo>" \
+  -e REPO_URL="https://github.com/$REPO" \
   -e RUNNER_TOKEN="$RUNNER_TOKEN" \
   -e LABELS="self-hosted,local-lab03" \
   -e EPHEMERAL=true \
@@ -491,12 +494,12 @@ docker logs -f lab03-runner          # watch for "Listening for Jobs"
 ```
 
 **2 — Dispatch the shipped workflow.** The repo already ships
-[`.github/workflows/self-hosted-demo.yml`](../.github/workflows/self-hosted-demo.yml) —
+[`.github/workflows/runner-demo.yml`](../.github/workflows/runner-demo.yml) —
 manual-only (`workflow_dispatch`), with `runs-on: [self-hosted, local-lab03]`, so there is
 nothing to write. Fire it, then flip to the runner's logs:
 
 ```bash
-gh workflow run self-hosted-demo.yml   # then watch the docker logs terminal
+gh workflow run runner-demo.yml   # then watch the docker logs terminal
 ```
 
 The steps run live in `docker logs`, on your machine, not GitHub's infra. The `shellcheck`

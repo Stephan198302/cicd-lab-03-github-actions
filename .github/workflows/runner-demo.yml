@@ -1,0 +1,8 @@
+name: runner-demo
+on: workflow_dispatch
+jobs:
+  hello:
+    runs-on: [self-hosted, local-lab03]
+    steps:
+      - run: echo "ran on $(hostname)"
+      - run: shellcheck --version   # ← not installed!

@@ -591,14 +591,16 @@ git diff --no-index \
         <div class="step"><div class="ix t">4</div><div class="tx"><b>Confirm it registered:</b> refresh the Runners tab (it appears, "Idle") and watch the logs print <b>"Listening for Jobs"</b>.</div></div>
       </div>
       <div>
-        <div class="code"><pre><span class="cm"># 2: short-lived registration token</span>
-export RUNNER_TOKEN="$(gh api -X POST \
-  repos/&lt;you&gt;/&lt;repo&gt;/actions/runners/registration-token \
-  --jq .token)"
+        <div class="code"><pre><span class="cm"># 1: your repo — auto-detected, no placeholders to edit</span>
+REPO=$(gh repo view --json nameWithOwner --jq .nameWithOwner)
+
+<span class="cm"># 2: short-lived registration token</span>
+RUNNER_TOKEN=$(gh api -X POST \
+  "repos/$REPO/actions/runners/registration-token" --jq .token)
 
 <span class="cm"># 3: start the ephemeral runner</span>
 docker run -d --rm --name lab03-runner \
-  -e REPO_URL="https://github.com/&lt;you&gt;/&lt;repo&gt;" \
+  -e REPO_URL="https://github.com/$REPO" \
   -e RUNNER_TOKEN="$RUNNER_TOKEN" \
   -e LABELS="self-hosted,local-lab03" \
   -e EPHEMERAL=true \
@@ -626,25 +628,25 @@ docker logs -f lab03-runner</pre></div>
     <div class="sechead"><span class="num warm">HANDS-ON · 2</span><div><div class="title">Route one job — watch it miss a tool</div><div class="lead">The repo ships a manual workflow that targets your runner by label. Dispatch it, then flip to the logs and watch it run on your own machine.</div></div></div>
     <div class="cols2">
       <div class="steps">
-        <div class="step"><div class="ix t">1</div><div class="tx"><b>Use the shipped workflow.</b> The repo already has <span class="inlinecode">.github/workflows/self-hosted-demo.yml</span> — <span class="inlinecode">runs-on: [self-hosted, local-lab03]</span> routes it to your container, and <span class="inlinecode">workflow_dispatch</span> means only <i>you</i> can trigger it. Nothing to write.</div></div>
-        <div class="step"><div class="ix t">2</div><div class="tx"><b>Dispatch it:</b> <span class="inlinecode">gh workflow run self-hosted-demo.yml</span>, then switch to the <span class="inlinecode">docker logs</span> terminal — the steps execute <b>live, locally</b>.</div></div>
+        <div class="step"><div class="ix t">1</div><div class="tx"><b>Use the shipped workflow.</b> The repo already has <span class="inlinecode">.github/workflows/runner-demo.yml</span> — <span class="inlinecode">runs-on: [self-hosted, local-lab03]</span> routes it to your container, and <span class="inlinecode">workflow_dispatch</span> means only <i>you</i> can trigger it. Nothing to write.</div></div>
+        <div class="step"><div class="ix t">2</div><div class="tx"><b>Dispatch it:</b> <span class="inlinecode">gh workflow run runner-demo.yml</span>, then switch to the <span class="inlinecode">docker logs</span> terminal — the steps execute <b>live, locally</b>.</div></div>
         <div class="step"><div class="ix t">3</div><div class="tx"><b>The gotcha:</b> the <span class="inlinecode">shellcheck</span> step <b>fails — command not found</b>. The runner only has what <i>you</i> put on it; "works on <span class="inlinecode">ubuntu-latest</span>" was an assumption GitHub's image quietly satisfied.</div></div>
         <div class="step"><div class="ix t">4</div><div class="tx"><b>Ephemeral payoff:</b> one job done, the container exits (<span class="inlinecode">--rm</span>) and the runner <b>drops off the Runners tab</b> on its own.</div></div>
       </div>
       <div>
         <div class="code"><pre><span class="cm"># the repo ships this — you just dispatch it:</span>
-<span class="cm">#   .github/workflows/self-hosted-demo.yml</span>
+<span class="cm">#   .github/workflows/runner-demo.yml</span>
+name: runner-demo
 on: workflow_dispatch         <span class="cm"># manual only — never a PR</span>
 jobs:
-  hello-from-my-machine:
+  hello:
     runs-on: [self-hosted, local-lab03]
     steps:
-      - uses: actions/checkout@v4
       - run: echo "ran on $(hostname)"
-      - run: shellcheck scripts/*.sh   <span class="cm"># ← bare runner lacks it</span>
+      - run: shellcheck --version   <span class="cm"># ← bare runner lacks it</span>
 
 <span class="cm"># dispatch it, then watch the docker logs terminal:</span>
-gh workflow run self-hosted-demo.yml</pre></div>
+gh workflow run runner-demo.yml</pre></div>
         <div class="goal warn-g" style="margin-top:16px">
           <span class="badge">The point</span>
           <p>The failure <b>is</b> the lesson — don't fix it. Self-hosted means <i>you</i> own the toolchain: install it on the host, or in the workflow. Labs 04-05 do this for real against a gateway.</p>
@@ -665,7 +667,7 @@ gh workflow run self-hosted-demo.yml</pre></div>
     <div class="sechead"><span class="num warm">HANDS-ON · 3</span><div><div class="title">Tear it down — cleanup is the exercise</div><div class="lead">A lingering runner or token is a standing risk. If you did the hands-on, these steps are <b>not</b> optional.</div></div></div>
     <div class="cols2">
       <div class="steps">
-        <div class="step"><div class="ix t">1</div><div class="tx"><b>The workflow stays</b> — <span class="inlinecode">self-hosted-demo.yml</span> is <span class="inlinecode">workflow_dispatch</span>-only, so it never fires unless you dispatch it. Nothing to delete; the <b>runner</b> is what you tear down.</div></div>
+        <div class="step"><div class="ix t">1</div><div class="tx"><b>The workflow stays</b> — <span class="inlinecode">runner-demo.yml</span> is <span class="inlinecode">workflow_dispatch</span>-only, so it never fires unless you dispatch it. Nothing to delete; the <b>runner</b> is what you tear down.</div></div>
         <div class="step"><div class="ix t">2</div><div class="tx"><b>Confirm the runner is gone</b> from <span class="inlinecode">Settings → Actions → Runners</span>. Ephemeral already exited after its one job; if one lingers "Offline", remove it by hand.</div></div>
         <div class="step"><div class="ix t">3</div><div class="tx"><b>Kill the container</b> if it's somehow still up: <span class="inlinecode">docker rm -f lab03-runner</span>. The <span class="inlinecode">gh</span> registration token auto-expires; if you minted a classic <b>PAT</b>, delete it now.</div></div>
         <div class="step"><div class="ix t">4</div><div class="tx"><b>That's the whole loop:</b> register → route → run → tear down. In Labs 04-05 you'll point a runner at a real gateway and actually deploy.</div></div>

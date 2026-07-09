@@ -3,6 +3,8 @@
 Jython 2.7 (Ignition). Pure functions that turn raw tag values into the strings
 shown on the screen. No tag or database access here, so you can read and change
 this without a gateway — and the lab's validate.sh can parse it offline.
+
+--Small change to trigger actions
 """
 
 PLACEHOLDER = "--"
@@ -15,3 +17,4 @@ def format_reading(value, units):
     Overview screen's KPI tiles via a runScript binding.
     """
     return "%.1f %s" % (value, units)
+    

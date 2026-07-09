@@ -1,3 +1,4 @@
+Smallchange
 # Lab 03 — GitHub Actions
 
 Day 2 of the [CI/CD for Ignition Masterclass](https://github.com/mustry-academy/cicd-masterclass) — a single hands-on workshop.

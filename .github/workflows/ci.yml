@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      # TODO: run scripts/validate.sh
+      - run: scripts/validate.sh
 
   lint:
     runs-on: ubuntu-latest
@@ -34,5 +34,7 @@ jobs:
       - uses: actions/checkout@v4
       # TODO (step 0): set up Python 3.12, then install the pinned tools
       #                (pip install yamllint==1.35.1 ign-lint==0.6.1)
-      # TODO: run each linter — yamllint, actionlint, shellcheck, ign-lint
+      - run: — yamllint, actionlint, shellcheck, ign-lint
       # TODO (step 2): add `docker compose config -q` as the final lint step
+      - run: docker compose config -q
+      
